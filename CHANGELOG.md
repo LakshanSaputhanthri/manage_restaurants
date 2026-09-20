@@ -14,6 +14,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   (falls back to SQLite when unset).
 - [django-unfold](https://github.com/unfoldadmin/django-unfold) admin theme.
 - Root `README.md` with setup/run instructions and this `CHANGELOG.md`.
+- Super-admin user management: `UserAdminViewSet` (`/api/auth/users/`) lists every staff account and
+  exposes a `set_password` action so a super admin can reset any user's password. On the frontend, a
+  new "Users" tab on the platform admin dashboard links to a per-user detail page
+  (`/staff/admin/users/:id`) with a change-password form.
 
 ### Changed
 
@@ -23,6 +27,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Backend Python version pinned to 3.12 via `backend/.python-version`. Python 3.14 hits a Django
   template `Context` copy incompatibility (`AttributeError: 'super' object has no attribute 'dicts'`)
   that surfaces on any page using `django-unfold`'s template tags.
+
+### Fixed
+
+- Django admin's "change password" link was missing on the `User` change page: `django-unfold`
+  replaces the stock read-only-password-hash widget template and only restores the link when the
+  `ModelAdmin` uses Unfold's own form classes. `StaffUserAdmin` now sets `form`/`add_form`/
+  `change_password_form` to `unfold.forms`' versions so the link shows again for every role.
 
 ### Removed
 

@@ -62,3 +62,7 @@ class CustomerRegisterSerializer(serializers.Serializer):
 class CustomerLoginSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=32)
     password = serializers.CharField(write_only=True)
+
+
+class SetPasswordSerializer(serializers.Serializer):
+    password = serializers.CharField(write_only=True, min_length=8)

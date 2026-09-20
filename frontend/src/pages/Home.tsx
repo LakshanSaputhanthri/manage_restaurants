@@ -1,3 +1,4 @@
+import { buttonVariants } from '@heroui/react'
 import { Link } from 'react-router-dom'
 
 export default function Home() {
@@ -8,13 +9,10 @@ export default function Home() {
         Customers reach this app by scanning a table QR or a restaurant's takeaway QR — this landing
         page is just for staff and restaurant owners.
       </p>
-      <Link to="/staff/login" className="rounded-lg bg-slate-900 px-4 py-3 text-center font-medium text-white">
+      <Link to="/staff/login" className={buttonVariants({ variant: 'primary', size: 'lg' })}>
         Staff login
       </Link>
-      <Link
-        to="/signup"
-        className="rounded-lg border border-slate-300 px-4 py-3 text-center font-medium text-slate-700"
-      >
+      <Link to="/signup" className={buttonVariants({ variant: 'outline', size: 'lg' })}>
         Register a restaurant
       </Link>
     </div>

@@ -6,9 +6,10 @@ NPM := npm --prefix frontend
 	lint-fix lint-fix-backend lint-fix-frontend \
 	type-check type-check-backend type-check-frontend \
 	type-fix type-fix-backend type-fix-frontend \
-	install install-backend install-frontend
+	install install-backend install-frontend \
+	migrate makemigrations
 
-## Run both dev servers (backend on :8000, frontend on :5173)
+## Run both dev servers (backend on :8000, frontend on :3000/:3001)
 run:
 	$(MAKE) -j2 run-backend run-frontend
 
@@ -16,7 +17,15 @@ run-backend:
 	$(UV) run manage.py runserver
 
 run-frontend:
-	$(NPM) run dev
+	$(NPM) run dev -- --port 3000
+
+## Apply database migrations
+migrate:
+	$(UV) run manage.py migrate
+
+## Create new migration files from model changes
+makemigrations:
+	$(UV) run manage.py makemigrations
 
 ## Install/refresh dependencies
 install: install-backend install-frontend

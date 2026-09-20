@@ -1,17 +1,20 @@
 import uuid
 
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from apps.accounts.authentication import CustomerTokenAuthentication
-from apps.accounts.models import Customer
+from apps.accounts.models import Customer, User
+from apps.accounts.permissions import IsSuperAdmin
 from apps.accounts.serializers import (
     CustomerLoginSerializer,
     CustomerRegisterSerializer,
     CustomerSerializer,
     GuestSessionSerializer,
+    SetPasswordSerializer,
     StaffTokenObtainPairSerializer,
     StaffUserSerializer,
 )
@@ -20,6 +23,7 @@ __all__ = [
     "StaffLoginView",
     "StaffTokenRefreshView",
     "StaffMeView",
+    "UserAdminViewSet",
     "GuestSessionView",
     "CustomerRegisterView",
     "CustomerLoginView",
@@ -41,6 +45,24 @@ class StaffMeView(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class UserAdminViewSet(viewsets.ReadOnlyModelViewSet):
+    """Super-admin-only view of every staff account, so the platform admin
+    can look up any user and reset their password."""
+
+    serializer_class = StaffUserSerializer
+    permission_classes = (IsSuperAdmin,)
+    queryset = User.objects.all().order_by("username")
+
+    @action(detail=True, methods=["post"])
+    def set_password(self, request, pk=None):
+        user = self.get_object()
+        serializer = SetPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user.set_password(serializer.validated_data["password"])
+        user.save(update_fields=["password"])
+        return Response(StaffUserSerializer(user).data)
 
 
 class GuestSessionView(APIView):

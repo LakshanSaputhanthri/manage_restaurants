@@ -17,6 +17,7 @@ import OwnerDashboard from './pages/staff/OwnerDashboard'
 import RestaurantSignupPage from './pages/staff/RestaurantSignupPage'
 import StaffLoginPage from './pages/staff/StaffLoginPage'
 import SuperAdminDashboard from './pages/staff/SuperAdminDashboard'
+import UserDetailPage from './pages/staff/UserDetailPage'
 
 const queryClient = new QueryClient()
 
@@ -77,6 +78,14 @@ export default function App() {
                   element={
                     <RequireRole role="super_admin">
                       <SuperAdminDashboard />
+                    </RequireRole>
+                  }
+                />
+                <Route
+                  path="/staff/admin/users/:id"
+                  element={
+                    <RequireRole role="super_admin">
+                      <UserDetailPage />
                     </RequireRole>
                   }
                 />

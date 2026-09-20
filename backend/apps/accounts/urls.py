@@ -1,6 +1,10 @@
-from django.urls import path
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
 
 from apps.accounts import views
+
+router = DefaultRouter()
+router.register("users", views.UserAdminViewSet, basename="user-admin")
 
 urlpatterns = [
     path("staff/login/", views.StaffLoginView.as_view(), name="staff-login"),
@@ -10,4 +14,5 @@ urlpatterns = [
     path("customers/register/", views.CustomerRegisterView.as_view(), name="customer-register"),
     path("customers/login/", views.CustomerLoginView.as_view(), name="customer-login"),
     path("customers/me/", views.CustomerMeView.as_view(), name="customer-me"),
+    path("", include(router.urls)),
 ]
