@@ -13,6 +13,11 @@ class StaffTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
     def validate(self, attrs):
+        login = attrs.get(self.username_field)
+        if login and "@" in login:
+            user = User.objects.filter(email__iexact=login).order_by("id").first()
+            if user:
+                attrs[self.username_field] = user.username
         data = super().validate(attrs)
         data["user"] = StaffUserSerializer(self.user).data
         return data

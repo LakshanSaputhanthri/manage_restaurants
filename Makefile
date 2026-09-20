@@ -7,7 +7,7 @@ NPM := npm --prefix frontend
 	type-check type-check-backend type-check-frontend \
 	type-fix type-fix-backend type-fix-frontend \
 	install install-backend install-frontend \
-	migrate makemigrations
+	migrate makemigrations createsuperuser
 
 ## Run both dev servers (backend on :8000, frontend on :3000/:3001)
 run:
@@ -26,6 +26,10 @@ migrate:
 ## Create new migration files from model changes
 makemigrations:
 	$(UV) run manage.py makemigrations
+
+## Create the default super admin (superadmin / superadmin@example.com / userpassword)
+createsuperuser:
+	$(UV) run manage.py create_superadmin
 
 ## Install/refresh dependencies
 install: install-backend install-frontend
