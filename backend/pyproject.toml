@@ -1,0 +1,48 @@
+[project]
+name = "podcast-backend"
+version = "0.1.0"
+description = "Podcast backend (Django)"
+requires-python = ">=3.12"
+dependencies = [
+    "Django>=5.1,<5.2",
+    "djangorestframework>=3.15",
+    "djangorestframework-simplejwt>=5.3",
+    "django-cors-headers>=4.4",
+    "channels>=4.1",
+    "channels-redis>=4.2",
+    "daphne>=4.1",
+    "qrcode>=7.4",
+    "Pillow>=10.4",
+    "python-dotenv>=1.0",
+    "psycopg[binary]>=3.3.6",
+    "django-unfold>=0.96.0",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.7",
+    "mypy>=1.11",
+    "django-stubs>=5.0",
+    "djangorestframework-stubs>=3.15",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+exclude = [".venv", "migrations"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "DJ"]
+ignore = ["DJ001"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["apps", "config"]
+
+[tool.mypy]
+python_version = "3.12"
+exclude = [".venv", "migrations"]
+ignore_missing_imports = true
+plugins = ["mypy_django_plugin.main"]
+
+[tool.django-stubs]
+django_settings_module = "config.settings"
