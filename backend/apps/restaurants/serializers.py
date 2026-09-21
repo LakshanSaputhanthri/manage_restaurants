@@ -7,6 +7,8 @@ from apps.restaurants.models import Restaurant
 
 class RestaurantSerializer(serializers.ModelSerializer):
     owner_username = serializers.CharField(source="owner.username", read_only=True)
+    owner_name = serializers.CharField(source="owner.first_name", read_only=True)
+    owner_email = serializers.CharField(source="owner.email", read_only=True)
 
     class Meta:
         model = Restaurant
@@ -19,6 +21,8 @@ class RestaurantSerializer(serializers.ModelSerializer):
             "phone",
             "logo",
             "owner_username",
+            "owner_name",
+            "owner_email",
             "created_at",
         )
         read_only_fields = ("id", "slug", "status", "created_at")
@@ -32,29 +36,40 @@ class PublicRestaurantSerializer(serializers.ModelSerializer):
 
 class RestaurantRegisterSerializer(serializers.Serializer):
     restaurant_name = serializers.CharField(max_length=150)
-    address = serializers.CharField(max_length=255, required=False, allow_blank=True)
-    phone = serializers.CharField(max_length=32, required=False, allow_blank=True)
-    owner_username = serializers.CharField(max_length=150)
-    owner_email = serializers.EmailField(required=False, allow_blank=True)
+    address = serializers.CharField(max_length=255)
+    phone = serializers.CharField(max_length=32)
+    owner_name = serializers.CharField(max_length=150)
+    owner_address = serializers.CharField(max_length=255)
+    owner_email = serializers.EmailField()
     owner_password = serializers.CharField(min_length=8, write_only=True)
+    owner_password_confirm = serializers.CharField(min_length=8, write_only=True)
 
-    def validate_owner_username(self, value):
-        if User.objects.filter(username=value).exists():
-            raise serializers.ValidationError("That username is already taken.")
+    def validate_owner_email(self, value):
+        if User.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError("An account with that email already exists.")
         return value
+
+    def validate(self, attrs):
+        if attrs["owner_password"] != attrs["owner_password_confirm"]:
+            raise serializers.ValidationError(
+                {"owner_password_confirm": "Passwords do not match."}
+            )
+        return attrs
 
     @transaction.atomic
     def create(self, validated_data):
         owner = User.objects.create_user(
-            username=validated_data["owner_username"],
-            email=validated_data.get("owner_email", ""),
+            username=validated_data["owner_email"],
+            email=validated_data["owner_email"],
             password=validated_data["owner_password"],
+            first_name=validated_data["owner_name"],
+            address=validated_data["owner_address"],
             role=Role.OWNER,
         )
         restaurant = Restaurant.objects.create(
             name=validated_data["restaurant_name"],
-            address=validated_data.get("address", ""),
-            phone=validated_data.get("phone", ""),
+            address=validated_data["address"],
+            phone=validated_data["phone"],
             owner=owner,
         )
         owner.restaurant = restaurant

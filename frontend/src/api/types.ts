@@ -30,6 +30,8 @@ export interface Restaurant {
   phone: string
   logo: string | null
   owner_username?: string
+  owner_name?: string
+  owner_email?: string
 }
 
 export interface Table {

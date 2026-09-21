@@ -8,11 +8,13 @@ export async function fetchPublicRestaurant(slug: string) {
 
 export async function registerRestaurant(payload: {
   restaurant_name: string
-  owner_username: string
+  address: string
+  phone: string
+  owner_name: string
+  owner_address: string
+  owner_email: string
   owner_password: string
-  owner_email?: string
-  address?: string
-  phone?: string
+  owner_password_confirm: string
 }) {
   const { data } = await publicApi.post('/api/restaurants/register/', payload)
   return data as { restaurant: Restaurant; access: string; refresh: string }

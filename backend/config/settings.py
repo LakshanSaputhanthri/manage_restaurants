@@ -152,14 +152,16 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": True,
 }
 
-CORS_ALLOWED_ORIGINS = env_list("CORS_ALLOWED_ORIGINS", "http://localhost:5173")
+CORS_ALLOWED_ORIGINS = env_list(
+    "CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3001"
+)
 CORS_ALLOW_CREDENTIALS = True
 
 from corsheaders.defaults import default_headers  # noqa: E402
 
 CORS_ALLOW_HEADERS = (*default_headers, "x-customer-token")
 
-FRONTEND_BASE_URL = os.environ.get("FRONTEND_BASE_URL", "http://localhost:5173")
+FRONTEND_BASE_URL = os.environ.get("FRONTEND_BASE_URL", "http://localhost:3000")
 BACKEND_BASE_URL = os.environ.get("BACKEND_BASE_URL", "http://127.0.0.1:8000")
 
 UNFOLD = {

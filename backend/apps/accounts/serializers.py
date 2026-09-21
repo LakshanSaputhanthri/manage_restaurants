@@ -26,7 +26,16 @@ class StaffTokenObtainPairSerializer(TokenObtainPairSerializer):
 class StaffUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "username", "email", "first_name", "last_name", "role", "restaurant")
+        fields = (
+            "id",
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "address",
+            "role",
+            "restaurant",
+        )
 
 
 class StaffUserCreateSerializer(serializers.ModelSerializer):

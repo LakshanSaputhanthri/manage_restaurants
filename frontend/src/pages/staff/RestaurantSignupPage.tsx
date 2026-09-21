@@ -1,16 +1,34 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { isAxiosError } from 'axios'
 import { registerRestaurant } from '../../api/restaurants'
 import { staffTokenStore } from '../../api/client'
+
+function extractErrorMessage(err: unknown): string {
+  if (isAxiosError(err)) {
+    if (!err.response) {
+      return 'Could not reach the server. Check your connection and try again.'
+    }
+    const data = err.response.data
+    if (data && typeof data === 'object') {
+      const firstError = Object.values(data).flat().find((v) => typeof v === 'string')
+      if (firstError) return firstError
+    }
+  }
+  return 'Could not register. Please try again.'
+}
 
 export default function RestaurantSignupPage() {
   const navigate = useNavigate()
   const [form, setForm] = useState({
     restaurant_name: '',
-    owner_username: '',
-    owner_password: '',
     address: '',
     phone: '',
+    owner_name: '',
+    owner_address: '',
+    owner_email: '',
+    owner_password: '',
+    owner_password_confirm: '',
   })
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -18,13 +36,17 @@ export default function RestaurantSignupPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setError('')
+    if (form.owner_password !== form.owner_password_confirm) {
+      setError('Passwords do not match.')
+      return
+    }
     setSubmitting(true)
     try {
       const result = await registerRestaurant(form)
       staffTokenStore.set(result.access, result.refresh)
       navigate('/staff/owner')
-    } catch {
-      setError('Could not register — check that the username is not already taken.')
+    } catch (err) {
+      setError(extractErrorMessage(err))
     } finally {
       setSubmitting(false)
     }
@@ -45,30 +67,55 @@ export default function RestaurantSignupPage() {
           className="w-full rounded-lg border border-slate-300 px-3 py-2"
         />
         <input
-          placeholder="Address"
+          required
+          placeholder="Restaurant address"
           value={form.address}
           onChange={(e) => setForm({ ...form, address: e.target.value })}
           className="w-full rounded-lg border border-slate-300 px-3 py-2"
         />
         <input
-          placeholder="Phone"
+          required
+          placeholder="Mobile number"
           value={form.phone}
           onChange={(e) => setForm({ ...form, phone: e.target.value })}
           className="w-full rounded-lg border border-slate-300 px-3 py-2"
         />
         <input
           required
-          placeholder="Owner username"
-          value={form.owner_username}
-          onChange={(e) => setForm({ ...form, owner_username: e.target.value })}
+          placeholder="Owner name"
+          value={form.owner_name}
+          onChange={(e) => setForm({ ...form, owner_name: e.target.value })}
+          className="w-full rounded-lg border border-slate-300 px-3 py-2"
+        />
+        <input
+          required
+          placeholder="Owner address"
+          value={form.owner_address}
+          onChange={(e) => setForm({ ...form, owner_address: e.target.value })}
+          className="w-full rounded-lg border border-slate-300 px-3 py-2"
+        />
+        <input
+          required
+          type="email"
+          placeholder="Email"
+          value={form.owner_email}
+          onChange={(e) => setForm({ ...form, owner_email: e.target.value })}
           className="w-full rounded-lg border border-slate-300 px-3 py-2"
         />
         <input
           required
           type="password"
-          placeholder="Owner password"
+          placeholder="Password"
           value={form.owner_password}
           onChange={(e) => setForm({ ...form, owner_password: e.target.value })}
+          className="w-full rounded-lg border border-slate-300 px-3 py-2"
+        />
+        <input
+          required
+          type="password"
+          placeholder="Confirm password"
+          value={form.owner_password_confirm}
+          onChange={(e) => setForm({ ...form, owner_password_confirm: e.target.value })}
           className="w-full rounded-lg border border-slate-300 px-3 py-2"
         />
         {error && <p className="text-sm text-red-600">{error}</p>}
@@ -80,6 +127,12 @@ export default function RestaurantSignupPage() {
           {submitting ? 'Registering…' : 'Register restaurant'}
         </button>
       </form>
+      <p className="mt-6 text-center text-sm text-slate-500">
+        Already registered?{' '}
+        <a href="/staff/login" className="font-medium text-slate-900 underline">
+          Log in here
+        </a>
+      </p>
     </div>
   )
 }

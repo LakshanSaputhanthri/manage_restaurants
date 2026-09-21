@@ -27,6 +27,7 @@ class User(AbstractUser):
     """Staff account: super admin, restaurant owner, chef, cashier, or employee."""
 
     role = models.CharField(max_length=20, choices=Role.choices)
+    address = models.CharField(max_length=255, blank=True)
     restaurant = models.ForeignKey(
         "restaurants.Restaurant",
         null=True,
